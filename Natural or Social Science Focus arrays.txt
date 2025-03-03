@@ -1,0 +1,116 @@
+
+				Natural or Social Science Focus arrays C program
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the struct to represent a rational number
+struct rational {
+    int numerator;
+    int denominator;
+};
+
+// Function to read rational numbers from the file
+void read_rationals(FILE *file, struct rational **data, int *size) {
+    fscanf(file, "%d", size); // Read the size of the array
+    *data = (struct rational *)malloc(*size * sizeof(struct rational));
+
+    for (int i = 0; i < *size; i++) {
+        fscanf(file, "%d %d", &(*data)[i].numerator, &(*data)[i].denominator);
+    }
+}
+
+// Function to add two rationals
+struct rational add_rationals(struct rational r1, struct rational r2) {
+    struct rational result;
+    result.numerator = r1.numerator * r2.denominator + r2.numerator * r1.denominator;
+    result.denominator = r1.denominator * r2.denominator;
+    return result;
+}
+
+// Function to multiply two rationals
+struct rational multiply_rationals(struct rational r1, struct rational r2) {
+    struct rational result;
+    result.numerator = r1.numerator * r2.numerator;
+    result.denominator = r1.denominator * r2.denominator;
+    return result;
+}
+
+// Function to subtract two rationals
+struct rational subtract_rationals(struct rational r1, struct rational r2) {
+    struct rational result;
+    result.numerator = r1.numerator * r2.denominator - r2.numerator * r1.denominator;
+    result.denominator = r1.denominator * r2.denominator;
+    return result;
+}
+
+// Function to divide two rationals
+struct rational divide_rationals(struct rational r1, struct rational r2) {
+    struct rational result;
+    result.numerator = r1.numerator * r2.denominator;
+    result.denominator = r1.denominator * r2.numerator;
+    return result;
+}
+
+// Function to print a rational number
+void print_rational(struct rational r) {
+    printf("%d/%d ", r.numerator, r.denominator);
+}
+
+// Function to compute the sum of all rationals
+struct rational compute_sum(struct rational *data, int size) {
+    struct rational sum = {0, 1}; // Initialize sum as 0/1
+    for (int i = 0; i < size; i++) {
+        sum = add_rationals(sum, data[i]);
+    }
+    return sum;
+}
+
+// Function to compute the average of all rationals
+struct rational compute_average(struct rational *data, int size) {
+    struct rational sum = compute_sum(data, size);
+    struct rational avg;
+    avg.numerator = sum.numerator / size;
+    avg.denominator = sum.denominator;
+    return avg;
+}
+
+int main() {
+    FILE *file = fopen("rationals.txt", "r");
+    if (file == NULL) {
+        printf("Error opening file\n");
+        return 1;
+    }
+
+    struct rational *data = NULL;
+    int size = 0;
+
+    // Read the file and load the rationals into the array
+    read_rationals(file, &data, &size);
+    fclose(file);
+
+    // Print all the rational numbers
+    printf("Rationals from the file:\n");
+    for (int i = 0; i < size; i++) {
+        print_rational(data[i]);
+    }
+    printf("\n");
+
+    // Compute and print the sum of the rationals
+    struct rational sum = compute_sum(data, size);
+    printf("Sum of all rationals: ");
+    print_rational(sum);
+    printf("\n");
+
+    // Compute and print the average of the rationals
+    struct rational avg = compute_average(data, size);
+    printf("Average of all rationals: ");
+    print_rational(avg);
+    printf("\n");
+
+    // Free dynamically allocated memory
+    free(data);
+
+    return 0;
+}
